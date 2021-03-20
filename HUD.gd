@@ -15,6 +15,21 @@ func set_message(msg):
 	$Msg.show()
 	$MsgTimer.start()
 
+func set_level(level):
+	$Level.text = "Level " + str(level)
+
+func show_play_UI(show):
+	if show == true:
+		pass
+	else:
+		pass
+
+func show_menu_UI(show):
+	if show == true:
+		pass
+	else:
+		pass
+
 func _on_MsgTimer_timeout():
 	$Msg.text = ""
 	$Msg.hide()

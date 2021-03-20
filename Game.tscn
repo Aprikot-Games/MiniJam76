@@ -8,15 +8,46 @@ script/source = "extends Node2D
 export (PackedScene) var Level
 
 # Constants
-enum state {START, PLAY, OVER}
+enum state {START, PLAY, WIN, OVER}
 
 # Globals
 var g_state = state.START
 var g_level = null
+var g_level_num = 0
 
 func change_state(new_state):
-	g_state = new_state
+	if new_state == state.START:
+		get_tree().reload_current_scene()
+		g_state = new_state
+	elif new_state == state.PLAY:
+		$HUD.show_menu_UI(false)
+		$HUD.show_play_UI(true)
+		$HUD.set_level(g_level_num)
+		g_state = new_state
+	elif new_state == state.WIN and g_state == state.PLAY:
+		$HUD.notify(\"Bomb found!\")
+		$Timer.start()
+		g_state = new_state
+	elif new_state == state.OVER and g_state == state.PLAY:
+		$HUD.notify(\"Game Over\")
+		$Timer.start()
+		g_state = new_state
+	else:
+		print(\"Invalid State\")
+		pass
 
+func advance_level():
+	g_level_num += 1
+
+func _on_Timer_timeout():
+	if g_state == state.OVER:
+		change_state(state.START)
+	elif g_state == state.WIN:
+		advance_level()
+		change_state(state.PLAY)
+	else:
+		pass
+	
 func _process(delta):
 	pass
 
@@ -24,13 +55,21 @@ func _process(delta):
 func _ready():
 	pass
 
+func _on_Start_pressed():
+	change_state(state.START)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func _on_Play_pressed():
+	change_state(state.PLAY)
+
+func _on_Win_pressed():
+	change_state(state.WIN)
+
+func _on_Over_pressed():
+	change_state(state.OVER)
 "
 
 [node name="Game" type="Node2D"]
+position = Vector2( 2, 5 )
 script = SubResource( 1 )
 
 [node name="HUD" type="CanvasLayer" parent="."]
@@ -41,9 +80,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -79.0
+margin_left = -80.1237
 margin_top = -45.6492
-margin_right = 79.0
+margin_right = 77.8763
 margin_bottom = -31.6492
 __meta__ = {
 "_edit_use_anchors_": false
@@ -51,4 +90,77 @@ __meta__ = {
 
 [node name="MsgTimer" type="Timer" parent="HUD"]
 wait_time = 2.5
+one_shot = true
+
+[node name="Level" type="Label" parent="HUD"]
+margin_left = 276.812
+margin_top = 3.37119
+margin_right = 316.812
+margin_bottom = 17.3712
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="DebugButtons" type="Node" parent="."]
+
+[node name="Start" type="Button" parent="DebugButtons"]
+anchor_left = 0.00625
+anchor_top = 0.0277778
+anchor_right = 0.00625
+anchor_bottom = 0.0277778
+margin_right = 55.0
+margin_bottom = 20.0
+text = "Start"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Play" type="Button" parent="DebugButtons"]
+anchor_left = 0.00625
+anchor_top = 0.0277778
+anchor_right = 0.00625
+anchor_bottom = 0.0277778
+margin_top = 27.3441
+margin_right = 55.0
+margin_bottom = 47.3441
+text = "Play"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Win" type="Button" parent="DebugButtons"]
+anchor_left = 0.00625
+anchor_top = 0.0277778
+anchor_right = 0.00625
+anchor_bottom = 0.0277778
+margin_top = 51.6916
+margin_right = 55.0
+margin_bottom = 71.6916
+text = "Win"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Over" type="Button" parent="DebugButtons"]
+anchor_left = 0.00625
+anchor_top = 0.0277778
+anchor_right = 0.00625
+anchor_bottom = 0.0277778
+margin_left = 0.374573
+margin_top = 74.8153
+margin_right = 55.3746
+margin_bottom = 94.8153
+text = "Over"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
 [connection signal="timeout" from="HUD/MsgTimer" to="HUD" method="_on_MsgTimer_timeout"]
+[connection signal="pressed" from="DebugButtons/Start" to="." method="_on_Start_pressed"]
+[connection signal="pressed" from="DebugButtons/Play" to="." method="_on_Play_pressed"]
+[connection signal="pressed" from="DebugButtons/Win" to="." method="_on_Win_pressed"]
+[connection signal="pressed" from="DebugButtons/Over" to="." method="_on_Over_pressed"]
+[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
