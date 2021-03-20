@@ -1,0 +1,54 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://HUD.gd" type="Script" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+export (PackedScene) var Level
+
+# Constants
+enum state {START, PLAY, OVER}
+
+# Globals
+var g_state = state.START
+var g_level = null
+
+func change_state(new_state):
+	g_state = new_state
+
+func _process(delta):
+	pass
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+"
+
+[node name="Game" type="Node2D"]
+script = SubResource( 1 )
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource( 1 )
+
+[node name="Msg" type="Label" parent="HUD"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -79.0
+margin_top = -45.6492
+margin_right = 79.0
+margin_bottom = -31.6492
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MsgTimer" type="Timer" parent="HUD"]
+wait_time = 2.5
+[connection signal="timeout" from="HUD/MsgTimer" to="HUD" method="_on_MsgTimer_timeout"]
