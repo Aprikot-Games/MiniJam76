@@ -16,19 +16,27 @@ func set_message(msg):
 	$MsgTimer.start()
 
 func set_level(level):
-	$Level.text = "Level " + str(level)
+	$Level.text = "Bomb count: " + str(level)
 
 func show_play_UI(show):
 	if show == true:
-		pass
+		$Level.show()
+		$Msg.show()
+		$Bar.show()
 	else:
-		pass
+		$Level.hide()
+		$Msg.hide()
+		$Bar.hide()
 
 func show_menu_UI(show):
 	if show == true:
-		pass
+		$StartButton.show()
+		$Cover.show()
+		$Background.show()
 	else:
-		pass
+		$StartButton.hide()
+		$Cover.hide()
+		$Background.hide()
 
 func _on_MsgTimer_timeout():
 	$Msg.text = ""

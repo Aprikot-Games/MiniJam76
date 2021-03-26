@@ -26,12 +26,21 @@ func _ready():
 			dug_map[i][j] = false
 	randomize()
 	# Place the bomb in a random position
-	bomb_pos[0] = randi()%9
-	bomb_pos[1] = randi()%16
-	print(bomb_pos[0])
-	print(bomb_pos[1])
+	bomb_pos[0] = (randi()%8) + 1
+	bomb_pos[1] = (randi()%15) + 1
+	#print(bomb_pos[0])
+	#print(bomb_pos[1])
+	$Bomb.position.x = (bomb_pos[1] * 18) + 9
+	$Bomb.position.y = (bomb_pos[0] * 18) + 9
+	$Bomb.hide()
 	$Player.position.x = 7 * TILE_SIZE + 9
 	$Player.position.y = 4 * TILE_SIZE + 9
+
+func set_player_speed(n):
+	$Player.MAX_SPEED = n
+
+func set_player_death():
+	$Player.player_dead = true
 
 func _on_Player_dig(pos):
 	var new_spot = Spot.instance()
@@ -40,9 +49,11 @@ func _on_Player_dig(pos):
 		new_spot.position.x = pos[1] * TILE_SIZE + TILE_OFFSET_X
 		new_spot.position.y = pos[0] * TILE_SIZE + TILE_OFFSET_Y
 		dug_map[pos[0]][pos[1]] = true
+		$DigSFX.play()
 	if pos[0] == bomb_pos[0] and pos[1] == bomb_pos[1]:
 		emit_signal("found_bomb")
-		print("Win the game")
+		$Bomb.show()
+		#print("Win the game")
 
 func _process(delta):
 	var player_pos = $Player.get_tile_pos()
@@ -52,3 +63,6 @@ func _process(delta):
 
 func _on_GeigerTimer_timeout():
 	$GeigerClick.play()
+
+func _on_rad_tick():
+	$Player.MAX_SPEED -= 1
